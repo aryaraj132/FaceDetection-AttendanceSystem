@@ -21,6 +21,7 @@ kv = Builder.load_file("my.kv")
 class MainApp(App):
     def build(self):
         return kv
+    Dir = os.path.dirname(os.path.realpath(__file__))
     def Attendence(self, userId, info):
         try:
             user_id = int(userId)
@@ -29,8 +30,8 @@ class MainApp(App):
             date = now.strftime("%d/%m/%Y")
 
             recog = cv2.face.LBPHFaceRecognizer_create()
-            recog.read('trainer/trainer.yml')
-            face = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            recog.read(self.Dir + '/trainer/trainer.yml')
+            face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
             font = cv2.FONT_HERSHEY_DUPLEX
 
@@ -84,7 +85,7 @@ class MainApp(App):
                     break
             if rec==1:
                 try:
-                    f1 = open("Attendance/User_"+str(id)+".txt","r")
+                    f1 = open(self.Dir + "/Attendance/User_"+str(id)+".txt","r")
                     data = f1.read()
                     f1.close()
                 except:
@@ -92,7 +93,7 @@ class MainApp(App):
                 if date in data:
                     info.text = "Attendence already entered."
                 else:
-                    f = open("Attendance/User_"+str(id)+".txt","a+")
+                    f = open(self.Dir + "/Attendance/User_"+str(id)+".txt","a+")
                     f.write(date_time)
                     f.write("\n")
                     f.close()
@@ -108,7 +109,7 @@ class MainApp(App):
             camera.set(3, 1920)
             camera.set(4, 1080)
 
-            face = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
             if len(face_id)<=0:
                 raise Exception("No ID provided")
             count = 0
@@ -121,7 +122,7 @@ class MainApp(App):
                     cv2.rectangle(image, (x,y),(x+w,y+h),(255,0,0),2)
                     count+=1
 
-                    cv2.imwrite("dataset/User_" + str(face_id) + '_' + str(count) + ".jpg", gray[y:y+h,x:x+w])
+                    cv2.imwrite(self.Dir + "/dataset/User_" + str(face_id) + '_' + str(count) + ".jpg", gray[y:y+h,x:x+w])
                     cv2.imshow('image', image)
                 
                 wait = cv2.waitKey(10) & 0xff
@@ -151,14 +152,14 @@ class MainApp(App):
             return faceSamples,ids
     def train(self,info):
         info.text = "Training Faces."
-        dataset = 'dataset'
+        dataset = self.Dir + '/dataset'
         recog = cv2.face.LBPHFaceRecognizer_create()
-        face = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         faces,ids=self.getImage_Labels(dataset,face)
         recog.train(faces, np.array(ids))
 
-        recog.write('trainer/trainer.yml')
+        recog.write(self.Dir + '/trainer/trainer.yml')
 
         info.text = str(len(np.unique(ids))) + " face trained."
 
