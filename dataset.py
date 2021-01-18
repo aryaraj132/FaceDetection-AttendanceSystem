@@ -27,7 +27,7 @@ while(True):
     wait = cv2.waitKey(100) & 0xff
     if wait == 60:
         break
-    elif count >=200:
+    elif count >=100:
         break
 
 print("\n [Info] Exiting Program")
