@@ -16,6 +16,7 @@ You can create a dataset of your face and train the system with that dataset, wi
 
 * Also install (pip install opencv-contrib-python)
 
+## Examples
 
 ![GUI ATTENDANCE SYSTEM](examples/example_gui.jpg?raw=true)
 ![GUI FACE DETECTION SYSTEM](examples/example.jpg?raw=true)
