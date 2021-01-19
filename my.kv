@@ -10,7 +10,6 @@ WindowManager:
     font_size:15
     color:1,0.6,0.7,1
     pos_hint:{"x":0}
-    size_hint: 0.25,0.05
     background_color: 0.3,0.4,0.5,1
     valign : "middle"
     halign : "center"
@@ -19,7 +18,6 @@ WindowManager:
     font_size:15
     color:1,0.6,0.7,1
     pos_hint:{"x":0.5}
-    size_hint: 0.7,0.05
 
 <AttendenceWindow>:
     name: "main"
@@ -48,11 +46,13 @@ WindowManager:
         Label:
             text:"Enter User ID: "
             pos_hint:{"x":0,"top":0.665}
+            size_hint: 0.25,0.05
 
         TextInput:
             id:user_id
             multiline:False
             pos_hint:{"x":0.3,"top":0.665}
+            size_hint: 0.7,0.05
             
         Button:
             text : "Mark Attendance"
@@ -62,7 +62,8 @@ WindowManager:
         Label:
             id:info
             text: ""
-            pos_hint:{"x":0.25,"top":0.1}
+            pos_hint:{"x":0.025,"top":0.1}
+            size_hint: 0.95,0.05
 
 <DatasetWindow>:
     name: "second"
@@ -89,18 +90,32 @@ WindowManager:
         Label:
             text:"Enter User ID: "
             pos_hint:{"x":0,"top":0.665}
+            size_hint: 0.25,0.05
 
         TextInput:
             id:user_id
             multiline:False
             pos_hint:{"x":0.3,"top":0.665}
+            size_hint: 0.7,0.05
+            
+        Label:
+            text:"Anount of snaps(200 recomended):  "
+            size_hint: 0.95,0.05
+            pos_hint:{"x":0.025,"top":0.60}
+
+        TextInput:
+            id:snap
+            multiline:False
+            size_hint: 0.95,0.05
+            pos_hint:{"x":0.025,"top":0.55}
             
         Button:
             text : "Load Face"
             pos_hint:{"x":0.025,"top":0.3}
             size_hint: 0.95,0.10
-            on_press : app.dataset(user_id.text,info)
+            on_press : app.dataset(user_id.text,snap.text,info)
         Label:
             id:info
             text: ""
-            pos_hint:{"x":0.25,"top":0.1}
+            pos_hint:{"x":0.025,"top":0.1}
+            size_hint: 0.95,0.05

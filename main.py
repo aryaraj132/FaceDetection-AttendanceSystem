@@ -103,8 +103,9 @@ class MainApp(App):
         except:
             info.text = "Some error occured. Try again!"
     
-    def dataset(self,face_id,info):
+    def dataset(self,face_id,snap,info):
         try:
+            snap_amount = int(snap)
             camera = cv2.VideoCapture(0)
             camera.set(3, 1920)
             camera.set(4, 1080)
@@ -128,7 +129,7 @@ class MainApp(App):
                 wait = cv2.waitKey(10) & 0xff
                 if wait == 27:
                     break
-                elif count >=100:
+                elif count >=snap_amount:
                     break
             camera.release()
             cv2.destroyAllWindows()
