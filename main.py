@@ -6,6 +6,8 @@ import numpy as np
 import os
 from datetime import datetime
 from PIL import Image
+from kivy.core.window import Window
+Window.clearcolor = (.8, .8, .8, 1)
 
 class AttendenceWindow(Screen):
     pass
