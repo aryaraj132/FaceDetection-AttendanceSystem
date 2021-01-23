@@ -7,6 +7,8 @@ import os
 from datetime import datetime
 from PIL import Image
 from kivy.core.window import Window
+import pandas as pd
+import csv
 Window.clearcolor = (.8, .8, .8, 1)
 
 class AttendenceWindow(Screen):
@@ -40,7 +42,6 @@ class MainApp(App):
             rec = 0
             id = 0
             face_numbers = 5
-            names = [0,'Anand Raj','Ankit Raj', 'Usha Jha', 4, 5, 6, 'Aryan Raj', 8]
 
             camera = cv2.VideoCapture(0)
             camera.set(3, 1920)
@@ -71,7 +72,8 @@ class MainApp(App):
                         cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,0,255), 1)
                     if (match < 100):
                         try:
-                            name = names[id]
+                            df = pd.read_csv(self.Dir + '/list/students.csv')
+                            name = df.loc[df['id'] == id, 'name'].iloc[0]
                         except:
                             name = "Unknown"
                         match = "  {0}%".format(round(100 - match))
@@ -105,7 +107,7 @@ class MainApp(App):
         except:
             info.text = "Some error occured. Try again!"
     
-    def dataset(self,face_id,snap,info):
+    def dataset(self,face_id,name,snap,info):
         try:
             snap_amount = int(snap)
             camera = cv2.VideoCapture(0)
@@ -113,29 +115,44 @@ class MainApp(App):
             camera.set(4, 1080)
 
             face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-            if len(face_id)<=0:
-                raise Exception("No ID provided")
-            count = 0
-            while(True):
-                rtrn, image=camera.read()
-                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                faces = face.detectMultiScale(gray, 1.3, 5)
+            if len(face_id)<=0 or len(name)<=0 or snap_amount <=0:
+                info.text = "All Fields Required"
+            else:
+                count = 0
+                while(True):
+                    rtrn, image=camera.read()
+                    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                    faces = face.detectMultiScale(gray, 1.3, 5)
 
-                for(x,y,w,h) in faces:
-                    cv2.rectangle(image, (x,y),(x+w,y+h),(255,0,0),2)
-                    count+=1
+                    for(x,y,w,h) in faces:
+                        cv2.rectangle(image, (x,y),(x+w,y+h),(255,0,0),2)
+                        count+=1
 
-                    cv2.imwrite(self.Dir + "/dataset/User_" + str(face_id) + '_' + str(count) + ".jpg", gray[y:y+h,x:x+w])
-                    cv2.imshow('image', image)
-                
-                wait = cv2.waitKey(10) & 0xff
-                if wait == 27:
-                    break
-                elif count >=snap_amount:
-                    break
-            camera.release()
-            cv2.destroyAllWindows()
-            info.text = "Face included successfully. Please train the system."
+                        cv2.imwrite(self.Dir + "/dataset/"+str(name)+"_" + str(face_id) + '_' + str(count) + ".jpg", gray[y:y+h,x:x+w])
+                        cv2.imshow('image', image)
+                    
+                    wait = cv2.waitKey(10) & 0xff
+                    if wait == 27:
+                        break
+                    elif count >=snap_amount:
+                        break
+                camera.release()
+                cv2.destroyAllWindows()
+                try:
+                    exist = False
+                    df = pd.read_csv(self.Dir + '/list/students.csv')
+                    for i in range(len(df['id'])):
+                        if df['id'].iloc[i] == int(face_id):
+                            exist = True
+                    if not exist:
+                        with open(self.Dir + '/list/students.csv', mode='a', newline='') as csv_file:
+                            fieldnames = ['id', 'name']
+                            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                            writer.writerow({'id': int(face_id), 'name': name})
+                        csv_file.close()
+                except Exception as e:
+                    print(e)
+                info.text = "Face included successfully. Please train the system."
         except:
             info.text = "Some error occured. Try again!"
     def getImage_Labels(self, dataset,face):

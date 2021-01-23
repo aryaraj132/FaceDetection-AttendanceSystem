@@ -87,6 +87,17 @@ WindowManager:
             size_hint: 0.33,0.10
         
         Label:
+            text:"Enter User Name: "
+            pos_hint:{"x":0,"top":0.765}
+            size_hint: 0.25,0.05
+
+        TextInput:
+            id:user_name
+            multiline:False
+            pos_hint:{"x":0.3,"top":0.765}
+            size_hint: 0.7,0.05
+            
+        Label:
             text:"Enter User ID: "
             pos_hint:{"x":0,"top":0.665}
             size_hint: 0.25,0.05
@@ -112,7 +123,7 @@ WindowManager:
             text : "Load Face"
             pos_hint:{"x":0.025,"top":0.3}
             size_hint: 0.95,0.10
-            on_press : app.dataset(user_id.text,snap.text,info)
+            on_press : app.dataset(user_id.text,user_name.text,snap.text,info)
         Label:
             id:info
             text: ""
