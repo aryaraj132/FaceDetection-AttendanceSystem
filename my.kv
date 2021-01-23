@@ -53,27 +53,37 @@ WindowManager:
                 app.AttendanceList()
             pos_hint:{"x":0.80,"top":1}
             size_hint: 0.20,0.10
-        
+        Image:
+            id: vid
+            size_hint: 1, 0.6
+            allow_stretch: True 
+            keep_ratio: True
+            pos_hint: {'x':0, 'top':0.87}
         Label:
             text:"Enter User ID: "
-            pos_hint:{"x":0,"top":0.665}
+            pos_hint:{"x":0,"top":0.25}
             size_hint: 0.25,0.05
 
         TextInput:
             id:user_id
             multiline:False
-            pos_hint:{"x":0.29,"top":0.665}
+            pos_hint:{"x":0.29,"top":0.25}
             size_hint: 0.7,0.05
             
         Button:
+            text : "Recognize Face"
+            pos_hint:{"x":0.025,"top":0.15}
+            size_hint: 0.45,0.10
+            on_press : app.startAttendence()
+        Button:
             text : "Mark Attendance"
-            pos_hint:{"x":0.025,"top":0.3}
-            size_hint: 0.95,0.10
-            on_press : app.startAttendence(user_id.text,info)
+            pos_hint:{"x":0.525,"top":0.15}
+            size_hint: 0.45,0.10
+            on_press : app.break_loop()
         Label:
             id:info
             text: ""
-            pos_hint:{"x":0.025,"top":0.1}
+            pos_hint:{"x":0.025,"top":0.05}
             size_hint: 0.95,0.05
 
 <DatasetWindow>:

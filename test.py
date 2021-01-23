@@ -16,7 +16,7 @@ class Manager(ScreenManager):
     pass
 
 
-Builder.load_string('''
+kv = Builder.load_string('''
 <MainScreen>:
     name: "Test"
 
@@ -36,9 +36,15 @@ Builder.load_string('''
             pos_hint: {'center_x':0.5, 'top':0.8}
 
         Button:
+            text: 'Start Video'
+            pos_hint: {"x":0.0, "y":0.1}
+            size_hint: 1.0, 0.1
+            font_size: 50
+            on_release: app.start_video()
+        Button:
             text: 'Stop Video'
             pos_hint: {"x":0.0, "y":0.0}
-            size_hint: 1.0, 0.2
+            size_hint: 1.0, 0.1
             font_size: 50
             on_release: app.stop_vid()
 ''')
@@ -50,13 +56,14 @@ class Main(App):
         # start the camera access code on a separate thread
         # if this was done on the main thread, GUI would stop
         # daemon=True means kill this thread when app stops
-        threading.Thread(target=self.doit, daemon=True).start()
+        
 
         sm = ScreenManager()
         self.main_screen = MainScreen()
         sm.add_widget(self.main_screen)
         return sm
-
+    def start_video(self):
+        threading.Thread(target=self.doit, daemon=True).start()
     def doit(self):
         # this code is run in a separate thread
         self.do_vid = True  # flag to stop loop
@@ -66,9 +73,9 @@ class Main(App):
         cv2.namedWindow('Hidden', cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO)
 
         # resize the window to (0,0) to make it invisible
-        cv2.resizeWindow('Hidden', 0, 0)
+        cv2.resizeWindow('Hidden', 100, 100)
         cam = cv2.VideoCapture(0)
-
+        font = cv2.FONT_HERSHEY_DUPLEX
         # start processing loop
         while (self.do_vid):
             ret, frame = cam.read()
@@ -80,6 +87,8 @@ class Main(App):
             # Must use Clock.schedule_once to get this bit of code
             # to run back on the main thread (required for GUI operations)
             # the partial function just says to call the specified method with the provided argument (Clock adds a time argument)
+            cv2.putText(frame, 'Hello', (10,10), font, 1, (255,255,255), 2)
+            cv2.putText(frame, 'Hell', (10,20), font, 1, (255,255,0), 1)
             Clock.schedule_once(partial(self.display_frame, frame))
 
             cv2.imshow('Hidden', frame)
@@ -105,7 +114,6 @@ class Main(App):
 
         # actually put the texture in the kivy Image widget
         self.main_screen.ids.vid.texture = texture
-
 
 if __name__ == '__main__':
     Main().run()

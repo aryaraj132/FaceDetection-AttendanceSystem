@@ -1,4 +1,7 @@
-from threading import Thread
+import threading
+from functools import partial
+from kivy.clock import Clock
+from kivy.graphics.texture import Texture
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,21 +28,23 @@ kv = Builder.load_file("my.kv")
 class MainApp(App):
     def build(self):
         return kv
+    running = False
     Dir = os.path.dirname(os.path.realpath(__file__))
-    def startAttendence(self, userId,info):
-        t = Thread(target=self.Attendence(userId,info))
-        t.daemon = True
-        t.start()
+    def break_loop(self):
+        self.running = False
+    def startAttendence(self):
+        threading.Thread(target=self.Attendence, daemon=True).start()
     def StudentList(self):
         os.startfile(self.Dir + '/list/students.csv')
     def AttendanceList(self):
         os.startfile(self.Dir + '/Attendance/Attendance.csv')
-    def Attendence(self, userId, info):
+    def Attendence(self):
+        self.running = True
         dataset_path = path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):
             os.mkdir(dataset_path)
         try:
-            user_id = int(userId)
+            user_id = int(kv.get_screen('main').ids.user_id.text)
             now = datetime.now()
             date_time = now.strftime("%d/%m/%Y %H:%M:%S")
             date = now.strftime("%d/%m/%Y")
@@ -53,7 +58,6 @@ class MainApp(App):
             rec = 0
             id = 0
             face_numbers = 5
-
             camera = cv2.VideoCapture(0)
             camera.set(3, 1920)
             camera.set(4, 1080)
@@ -61,7 +65,7 @@ class MainApp(App):
             minWidth = 0.001*camera.get(3)
             minHeight = 0.001*camera.get(4)
 
-            while True:
+            while self.running:
                 rtrn, image=camera.read()
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 faces = face.detectMultiScale( 
@@ -93,9 +97,9 @@ class MainApp(App):
                         match = "  {0}%".format(round(100 - match))
                     cv2.putText(image, str(name), (x+5,y-5), font, 1, (255,255,255), 2)
                     cv2.putText(image, str(match), (x+5,y+h-5), font, 1, (255,255,0), 1)
-                
-                cv2.imshow('camera',image) 
-                k = cv2.waitKey(10) & 0xff 
+                Clock.schedule_once(partial(self.display_frame, image))
+                 
+                k = cv2.waitKey(1)
                 if k == 27:
                     break
             if rec==1:
@@ -105,19 +109,24 @@ class MainApp(App):
                     if (int(df.loc[df['id'] == id, date].iloc[0]))==0:
                         df.loc[df['id'] == id, date]=1
                         df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
-                        info.text = "Attendence entered successfully."
+                        kv.get_screen('main').ids.info.text = "Attendence entered successfully."
                     else:
-                        info.text = "Attendence already exist."
+                        kv.get_screen('main').ids.info.text = "Attendence already exist."
                 else:
                     df[date] = coll
                     df.loc[df['id'] == id, date]=1
                     df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
-                    info.text = "Attendence entered successfully."
+                    kv.get_screen('main').ids.info.text = "Attendence entered successfully."
             camera.release()
             cv2.destroyAllWindows()
-        except:
-            info.text = "Some error occured. Try again!"
-    
+        except Exception as e:
+            kv.get_screen('main').ids.info.text = "Some error occured. Try again!"
+            print(e)
+    def display_frame(self, frame, dt):
+        texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+        texture.blit_buffer(frame.tobytes(order=None), colorfmt='bgr', bufferfmt='ubyte')
+        texture.flip_vertical()
+        kv.get_screen('main').ids.vid.texture = texture
     def dataset(self,face_id,name,snap,info):
         dataset_path = path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):
