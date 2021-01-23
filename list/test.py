@@ -9,7 +9,7 @@ dir = os.path.dirname(os.path.realpath(__file__))
 df = pd.read_csv(dir + '/students.csv')
 coll = ['0']*len(df['id'])
 print(df)
-df.append({'id': '8', 'name':'me'}, ignore_index=True)
+df.loc[len(df.index)] = [8,'me']
 print(df)
 # df['Attendance'] = coll
 # df.to_csv(dir + '/students.csv', index=False)

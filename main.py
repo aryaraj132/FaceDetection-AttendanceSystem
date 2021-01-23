@@ -8,7 +8,6 @@ from datetime import datetime
 from PIL import Image
 from kivy.core.window import Window
 import pandas as pd
-import csv
 Window.clearcolor = (.8, .8, .8, 1)
 
 class AttendenceWindow(Screen):
@@ -145,11 +144,8 @@ class MainApp(App):
                         if df['id'].iloc[i] == int(face_id):
                             exist = True
                     if not exist:
-                        with open(self.Dir + '/list/students.csv', mode='a', newline='') as csv_file:
-                            fieldnames = ['id', 'name']
-                            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                            writer.writerow({'id': int(face_id), 'name': name})
-                        csv_file.close()
+                        df.loc[len(df.index)] = [int(face_id),name]
+                        df.to_csv(self.Dir + '/list/students.csv', index=False)
                 except Exception as e:
                     print(e)
                 info.text = "Face included successfully. Please train the system."
