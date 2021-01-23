@@ -25,7 +25,11 @@ class MainApp(App):
     def build(self):
         return kv
     Dir = os.path.dirname(os.path.realpath(__file__))
+    
     def Attendence(self, userId, info):
+        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        if not (os.path.isdir(dataset_path)):
+            os.mkdir(dataset_path)
         try:
             user_id = int(userId)
             now = datetime.now()
@@ -107,6 +111,9 @@ class MainApp(App):
             info.text = "Some error occured. Try again!"
     
     def dataset(self,face_id,name,snap,info):
+        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        if not (os.path.isdir(dataset_path)):
+            os.mkdir(dataset_path)
         try:
             snap_amount = int(snap)
             camera = cv2.VideoCapture(0)
@@ -167,6 +174,9 @@ class MainApp(App):
                     ids.append(id)
             return faceSamples,ids
     def train(self,info):
+        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        if not (os.path.isdir(dataset_path)):
+            os.mkdir(dataset_path)
         info.text = "Training Faces."
         dataset = self.Dir + '/dataset'
         recog = cv2.face.LBPHFaceRecognizer_create()
