@@ -2,11 +2,11 @@ import csv
 import os
 import pandas as pd
 from datetime import datetime
-
+# dir = os.path.dirname(os.path.realpath(__file__))
+# os.startfile(dir + '/students.csv')
 # now = datetime.now()
 # date_time = now.strftime("%d/%m/%Y %H:%M:%S")
 # date = now.strftime("%d/%m/%Y")
-# dir = os.path.dirname(os.path.realpath(__file__))
 # dataset_path = path = os.path.join(dir, 'dataset') 
 # if not (os.path.isdir(dataset_path)):
 #     os.mkdir(dataset_path)

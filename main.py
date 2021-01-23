@@ -1,3 +1,4 @@
+from threading import Thread
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,7 +26,14 @@ class MainApp(App):
     def build(self):
         return kv
     Dir = os.path.dirname(os.path.realpath(__file__))
-    
+    def startAttendence(self, userId,info):
+        t = Thread(target=self.Attendence(userId,info))
+        t.daemon = True
+        t.start()
+    def StudentList(self):
+        os.startfile(self.Dir + '/list/students.csv')
+    def AttendanceList(self):
+        os.startfile(self.Dir + '/Attendance/Attendance.csv')
     def Attendence(self, userId, info):
         dataset_path = path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):

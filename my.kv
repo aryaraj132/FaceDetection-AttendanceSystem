@@ -27,11 +27,11 @@ WindowManager:
             text:"Attendance"
             on_release: app.root.current = "main"
             pos_hint:{"x":0,"top":1}
-            size_hint: 0.33,0.10
+            size_hint: 0.20,0.10
         Button:
             text:"Train Faces"
-            pos_hint:{"x":0.335,"top":1}
-            size_hint: 0.33,0.10
+            pos_hint:{"x":0.20,"top":1}
+            size_hint: 0.20,0.10
             on_press : 
                 app.train(info)
         Button:
@@ -39,8 +39,20 @@ WindowManager:
             on_release: 
                 app.root.current = "second"
                 root.manager.transition.direction = "left"
-            pos_hint:{"x":0.67,"top":1}
-            size_hint: 0.33,0.10
+            pos_hint:{"x":0.40,"top":1}
+            size_hint: 0.20,0.10
+        Button:
+            text:"Show Student"
+            on_release: 
+                app.StudentList()
+            pos_hint:{"x":0.60,"top":1}
+            size_hint: 0.20,0.10
+        Button:
+            text:"Show Attendance"
+            on_release: 
+                app.AttendanceList()
+            pos_hint:{"x":0.80,"top":1}
+            size_hint: 0.20,0.10
         
         Label:
             text:"Enter User ID: "
@@ -50,14 +62,14 @@ WindowManager:
         TextInput:
             id:user_id
             multiline:False
-            pos_hint:{"x":0.3,"top":0.665}
+            pos_hint:{"x":0.29,"top":0.665}
             size_hint: 0.7,0.05
             
         Button:
             text : "Mark Attendance"
             pos_hint:{"x":0.025,"top":0.3}
             size_hint: 0.95,0.10
-            on_press : app.Attendence(user_id.text,info)
+            on_press : app.startAttendence(user_id.text,info)
         Label:
             id:info
             text: ""
@@ -74,18 +86,29 @@ WindowManager:
                 app.root.current = "main"
                 root.manager.transition.direction = "right"
             pos_hint:{"x":0,"top":1}
-            size_hint: 0.33,0.10
+            size_hint: 0.20,0.10
         Button:
             text:"Train Faces"
-            pos_hint:{"x":0.335,"top":1}
-            size_hint: 0.33,0.10
+            pos_hint:{"x":0.20,"top":1}
+            size_hint: 0.20,0.10
             on_press : app.train(info)
         Button:
             text:"Load Face"
             on_release: app.root.current = "second"
-            pos_hint:{"x":0.67,"top":1}
-            size_hint: 0.33,0.10
-        
+            pos_hint:{"x":0.40,"top":1}
+            size_hint: 0.20,0.10
+        Button:
+            text:"Show Student"
+            on_release: 
+                app.StudentList()
+            pos_hint:{"x":0.60,"top":1}
+            size_hint: 0.20,0.10
+        Button:
+            text:"Show Attendance"
+            on_release: 
+                app.AttendanceList()
+            pos_hint:{"x":0.80,"top":1}
+            size_hint: 0.20,0.10
         Label:
             text:"Enter User Name: "
             pos_hint:{"x":0,"top":0.765}
@@ -94,7 +117,7 @@ WindowManager:
         TextInput:
             id:user_name
             multiline:False
-            pos_hint:{"x":0.3,"top":0.765}
+            pos_hint:{"x":0.29,"top":0.765}
             size_hint: 0.7,0.05
             
         Label:
@@ -105,7 +128,7 @@ WindowManager:
         TextInput:
             id:user_id
             multiline:False
-            pos_hint:{"x":0.3,"top":0.665}
+            pos_hint:{"x":0.29,"top":0.665}
             size_hint: 0.7,0.05
             
         Label:
