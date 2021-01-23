@@ -33,7 +33,7 @@ WindowManager:
             pos_hint:{"x":0.20,"top":1}
             size_hint: 0.20,0.10
             on_press : 
-                app.train(info)
+                app.startTrain()
         Button:
             text:"Load Face"
             on_release: 
@@ -101,7 +101,7 @@ WindowManager:
             text:"Train Faces"
             pos_hint:{"x":0.20,"top":1}
             size_hint: 0.20,0.10
-            on_press : app.train(info)
+            on_press : app.startTrain()
         Button:
             text:"Load Face"
             on_release: app.root.current = "second"
@@ -142,7 +142,7 @@ WindowManager:
             size_hint: 0.7,0.05
             
         Label:
-            text:"Anount of snaps(200 recomended):  "
+            text:"Amount of snaps(200 recomended):  "
             size_hint: 0.95,0.05
             pos_hint:{"x":0.025,"top":0.60}
 
@@ -156,7 +156,7 @@ WindowManager:
             text : "Load Face"
             pos_hint:{"x":0.025,"top":0.3}
             size_hint: 0.95,0.10
-            on_press : app.dataset(user_id.text,user_name.text,snap.text,info)
+            on_press : app.startDataset()
         Label:
             id:info
             text: ""

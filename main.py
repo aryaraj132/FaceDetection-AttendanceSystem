@@ -34,6 +34,10 @@ class MainApp(App):
         self.running = False
     def startAttendence(self):
         threading.Thread(target=self.Attendence, daemon=True).start()
+    def startTrain(self):
+        threading.Thread(target=self.train, daemon=True).start()
+    def startDataset(self):
+        threading.Thread(target=self.dataset, daemon=True).start()
     def StudentList(self):
         os.startfile(self.Dir + '/list/students.csv')
     def AttendanceList(self):
@@ -85,7 +89,7 @@ class MainApp(App):
                         cv2.rectangle(image, (x,y), (x+w,y+h), (0,0,255), 2)
                         status = "Attandance Not Recorded"
                         cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,0,255), 1)
-                    if (match < 100):
+                    if (match < 35):
                         try:
                             df = pd.read_csv(self.Dir + '/list/students.csv')
                             name = df.loc[df['id'] == id, 'name'].iloc[0]
@@ -127,19 +131,21 @@ class MainApp(App):
         texture.blit_buffer(frame.tobytes(order=None), colorfmt='bgr', bufferfmt='ubyte')
         texture.flip_vertical()
         kv.get_screen('main').ids.vid.texture = texture
-    def dataset(self,face_id,name,snap,info):
+    def dataset(self):
         dataset_path = path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):
             os.mkdir(dataset_path)
         try:
-            snap_amount = int(snap)
+            name = kv.get_screen('second').ids.user_name.text
+            face_id = kv.get_screen('second').ids.user_id.text
+            snap_amount = int(kv.get_screen('second').ids.snap.text)
             camera = cv2.VideoCapture(0)
             camera.set(3, 1920)
             camera.set(4, 1080)
 
             face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
             if len(face_id)<=0 or len(name)<=0 or snap_amount <=0:
-                info.text = "All Fields Required"
+                kv.get_screen('second').ids.info.text = "All Fields Required"
             else:
                 count = 0
                 while(True):
@@ -172,9 +178,9 @@ class MainApp(App):
                         df.to_csv(self.Dir + '/list/students.csv', index=False)
                 except Exception as e:
                     print(e)
-                info.text = "Face included successfully. Please train the system."
+                kv.get_screen('second').ids.info.text = "Face included successfully. Please train the system."
         except:
-            info.text = "Some error occured. Try again!"
+            kv.get_screen('second').ids.info.text = "Some error occured. Try again!"
     def getImage_Labels(self, dataset,face):
             imagesPath=[os.path.join(dataset,f) for f in os.listdir(dataset)]
             faceSamples = []
@@ -190,11 +196,12 @@ class MainApp(App):
                     faceSamples.append(img_numpy[y:y+h,x:x+w])
                     ids.append(id)
             return faceSamples,ids
-    def train(self,info):
+    def train(self):
         dataset_path = path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):
             os.mkdir(dataset_path)
-        info.text = "Training Faces."
+        kv.get_screen('main').ids.info.text = "Training Faces."
+        kv.get_screen('second').ids.info.text = "Training Faces."
         dataset = self.Dir + '/dataset'
         recog = cv2.face.LBPHFaceRecognizer_create()
         face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -204,7 +211,8 @@ class MainApp(App):
 
         recog.write(self.Dir + '/trainer/trainer.yml')
 
-        info.text = str(len(np.unique(ids))) + " face trained."
+        kv.get_screen('main').ids.info.text = str(len(np.unique(ids))) + " face trained."
+        kv.get_screen('second').ids.info.text = str(len(np.unique(ids))) + " face trained."
 
 if(__name__ == "__main__"):
     MainApp().run()
