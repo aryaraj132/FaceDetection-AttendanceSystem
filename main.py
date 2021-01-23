@@ -88,19 +88,19 @@ class MainApp(App):
                 if k == 27:
                     break
             if rec==1:
-                try:
-                    f1 = open(self.Dir + "/Attendance/User_"+str(id)+".txt","r")
-                    data = f1.read()
-                    f1.close()
-                except:
-                    data =''
-                if date in data:
-                    info.text = "Attendence already entered."
+                df = pd.read_csv(self.Dir + '/Attendance/Attendance.csv')
+                coll = ['0']*len(df['id'])
+                if date in df.columns:
+                    if (int(df.loc[df['id'] == id, date].iloc[0]))==0:
+                        df.loc[df['id'] == id, date]=1
+                        df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
+                        info.text = "Attendence entered successfully."
+                    else:
+                        info.text = "Attendence already exist."
                 else:
-                    f = open(self.Dir + "/Attendance/User_"+str(id)+".txt","a+")
-                    f.write(date_time)
-                    f.write("\n")
-                    f.close()
+                    df[date] = coll
+                    df.loc[df['id'] == id, date]=1
+                    df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
                     info.text = "Attendence entered successfully."
             camera.release()
             cv2.destroyAllWindows()
