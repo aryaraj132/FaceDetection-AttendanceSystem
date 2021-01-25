@@ -26,10 +26,12 @@ class WindowManager(ScreenManager):
 kv = Builder.load_file("my.kv")
 
 class MainApp(App):
-    def build(self):
-        return kv
     running = False
     Dir = os.path.dirname(os.path.realpath(__file__))
+    def build(self):
+        self.icon = self.Dir + '/webcam.ico'
+        self.title = 'Face Detection Attendance System'
+        return kv
     def break_loop(self):
         self.running = False
     def startAttendence(self):
