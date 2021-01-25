@@ -2,7 +2,7 @@
 
 ### An attendance system using Face Recognition feature using OpenCV library of Python
 
-> Get this app [here](https://drive.google.com/file/d/1ZQBZQIHgwUdyWLGXz4f_6FM7P8kzf4iA/view?usp=sharing)
+> # Get this app [here](https://drive.google.com/file/d/1ZQBZQIHgwUdyWLGXz4f_6FM7P8kzf4iA/view?usp=sharing)
 
 This project is build for CODETHON'21 Under Engineering College Ajmer.
 
@@ -21,5 +21,4 @@ You can create a dataset of your face and train the system with that dataset, wi
 ## Examples
 
 ![GUI ATTENDANCE SYSTEM](examples/example_gui.jpg?raw=true)
-![GUI FACE DETECTION SYSTEM](examples/example.jpg?raw=true)
 ![GUI DATASET SYSTEM](examples/example_gui_2.jpg?raw=true)
