@@ -2,7 +2,7 @@
 
 ### An attendance system using Face Recognition feature using OpenCV library of Python
 
-> # Get this app [here](https://drive.google.com/file/d/1ZQBZQIHgwUdyWLGXz4f_6FM7P8kzf4iA/view?usp=sharing)
+> # Get this app [here](https://github.com/aryaraj132/FaceDetection-AttendanceSystem/blob/master/setup.exe?raw=true)
 
 This project is build for CODETHON'21 Under Engineering College Ajmer.
 
