@@ -55,7 +55,7 @@ class MainApp(App):
 
             recog = cv2.face.LBPHFaceRecognizer_create()
             recog.read(self.Dir + '/trainer/trainer.yml')
-            face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+            face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
 
             font = cv2.FONT_HERSHEY_DUPLEX
 
@@ -143,7 +143,7 @@ class MainApp(App):
             camera.set(3, 1920)
             camera.set(4, 1080)
 
-            face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+            face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
             if len(face_id)<=0 or len(name)<=0 or snap_amount <=0:
                 kv.get_screen('second').ids.info.text = "All Fields Required"
             else:
@@ -204,7 +204,7 @@ class MainApp(App):
         kv.get_screen('second').ids.info.text = "Training Faces."
         dataset = self.Dir + '/dataset'
         recog = cv2.face.LBPHFaceRecognizer_create()
-        face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
 
         faces,ids=self.getImage_Labels(dataset,face)
         recog.train(faces, np.array(ids))
