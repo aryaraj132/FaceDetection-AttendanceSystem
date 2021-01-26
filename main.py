@@ -178,6 +178,15 @@ class MainApp(App):
                     if not exist:
                         df.loc[len(df.index)] = [int(face_id),name]
                         df.to_csv(self.Dir + '/list/students.csv', index=False)
+                    df1 = pd.read_csv(self.Dir + '/Attendance/Attendance.csv')
+                    for i in range(len(df1['id'])):
+                        if df1['id'].iloc[i] == int(face_id):
+                            exist = True
+                    if not exist:
+                        arr = [int(face_id),name]
+                        arr = np.concatenate((arr,[0]*(len(df1.columns)-2)))
+                        df1.loc[len(df1.index)] = arr
+                        df1.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
                 except Exception as e:
                     print(e)
                 kv.get_screen('second').ids.info.text = "Face included successfully. Please train the system."

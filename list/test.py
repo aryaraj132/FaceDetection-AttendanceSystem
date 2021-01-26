@@ -1,13 +1,29 @@
 import csv
 import os
 import pandas as pd
+import numpy as np
 from datetime import datetime
+
 # dir = os.path.dirname(os.path.realpath(__file__))
+# print(dir)
+# exist = False
+# df1 = pd.read_csv('C:/Users/aryar/Documents/GitHub/FaceDetection/Attendance/Attendance.csv')
+# for i in range(len(df1['id'])):
+#     if df1['id'].iloc[i] == 8:
+#         exist = True
+# if not exist:
+#     arr = [8,'Ankit']
+#     arr = np.concatenate((arr,[0]*(len(df1.columns)-2)))
+#     print(arr)
+#     df1.loc[len(df1.index)] = arr
+#     print(df1)
+    #df1.to_csv('C:/Users/aryar/Documents/GitHub/FaceDetection/Attendance/Attendance.csv', index=False)
+
 # os.startfile(dir + '/students.csv')
 # now = datetime.now()
 # date_time = now.strftime("%d/%m/%Y %H:%M:%S")
 # date = now.strftime("%d/%m/%Y")
-# dataset_path = path = os.path.join(dir, 'dataset') 
+# dataset_path = path = os.path.join(dir, 'dataset')
 # if not (os.path.isdir(dataset_path)):
 #     os.mkdir(dataset_path)
 # df = pd.read_csv(dir + '/students.csv')
