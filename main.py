@@ -82,16 +82,11 @@ class MainApp(App):
                 )
                 for(x,y,w,h) in faces:
                     id, match = recog.predict(gray[y:y+h,x:x+w])
-                    if id == user_id:
+                    if (id == user_id) and (match < 35):
                         rec = 1
                         cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
                         status = "Attandance Recorded"
                         cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,255,0), 1)
-                    else:
-                        cv2.rectangle(image, (x,y), (x+w,y+h), (0,0,255), 2)
-                        status = "Attandance Not Recorded"
-                        cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,0,255), 1)
-                    if (match < 35):
                         try:
                             df = pd.read_csv(self.Dir + '/list/students.csv')
                             name = df.loc[df['id'] == id, 'name'].iloc[0]
@@ -99,6 +94,10 @@ class MainApp(App):
                             name = "Unknown"
                         match = "  {0}%".format(round(100 - match))
                     else:
+                        rec = 0
+                        cv2.rectangle(image, (x,y), (x+w,y+h), (0,0,255), 2)
+                        status = "Attandance Not Recorded"
+                        cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,0,255), 1)
                         name = "unknown"
                         match = "  {0}%".format(round(100 - match))
                     cv2.putText(image, str(name), (x+5,y-5), font, 1, (255,255,255), 2)
