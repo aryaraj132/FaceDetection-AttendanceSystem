@@ -54,7 +54,7 @@ class MainApp(App):
             now = datetime.now()
             date_time = now.strftime("%d/%m/%Y %H:%M:%S")
             date = now.strftime("%d/%m/%Y")
-
+            eye = cv2.CascadeClassifier(self.Dir + '/haarcascade_eye.xml')
             recog = cv2.face.LBPHFaceRecognizer_create()
             recog.read(self.Dir + '/trainer/trainer.yml')
             face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
@@ -70,7 +70,8 @@ class MainApp(App):
 
             minWidth = 0.001*camera.get(3)
             minHeight = 0.001*camera.get(4)
-
+            blink = 0
+            is_eye = False
             while self.running:
                 rtrn, image=camera.read()
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -80,6 +81,18 @@ class MainApp(App):
                     minNeighbors = face_numbers,
                     minSize = (int(minWidth), int(minHeight)),
                 )
+                eyes = eye.detectMultiScale(image,scaleFactor = 1.2, minNeighbors = 5) 
+                for (x, y, w, h) in eyes: 
+                    cv2.rectangle(image, (x, y),  
+                                (x + w, y + h), (255, 0, 0), 1)
+                if len(eyes) >= 2:
+                    is_eye = True
+                    cv2.putText(image, "eye detected", (50,50), font, 1, (0,255,0), 1)
+                if(len(faces)==0):
+                    blink = 0
+                if len(eyes) < 2:
+                    blink+=1
+                cv2.putText(image, "Blink(16+) : {}".format(blink), (1020,50), font, 1, (0,0,255), 2)
                 for(x,y,w,h) in faces:
                     id, match = recog.predict(gray[y:y+h,x:x+w])
                     if (id == user_id) and (match < 35):
@@ -107,7 +120,7 @@ class MainApp(App):
                 k = cv2.waitKey(1)
                 if k == 27:
                     break
-            if rec==1:
+            if rec==1 and blink >15:
                 df = pd.read_csv(self.Dir + '/Attendance/Attendance.csv')
                 coll = ['0']*len(df['id'])
                 if date in df.columns:
@@ -122,6 +135,8 @@ class MainApp(App):
                     df.loc[df['id'] == id, date]=1
                     df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
                     kv.get_screen('main').ids.info.text = "Attendence entered successfully."
+            else:
+                kv.get_screen('main').ids.info.text = "Attendence not entered."
             camera.release()
             cv2.destroyAllWindows()
         except Exception as e:
