@@ -116,7 +116,6 @@ class MainApp(App):
                     cv2.putText(image, str(name), (x+5,y-5), font, 1, (255,255,255), 2)
                     cv2.putText(image, str(match), (x+5,y+h-5), font, 1, (255,255,0), 1)
                 Clock.schedule_once(partial(self.display_frame, image))
-                 
                 k = cv2.waitKey(1)
                 if k == 27:
                     break
