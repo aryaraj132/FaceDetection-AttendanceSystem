@@ -2,7 +2,7 @@
 name = "facedetection-attendancesystem"
 version = "0.1.0"
 description = "An attendance system using Face Recognition feature using OpenCV library of Python"
-authors = ["Your Name <you@example.com>"]
+authors = ["Aryan Raj <aryaraj132@gmail.com>"]
 readme = "README.md"
 packages = [{include = "facedetection_attendancesystem"}]
 
