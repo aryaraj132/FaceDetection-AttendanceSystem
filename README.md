@@ -21,7 +21,10 @@ You can create a dataset of your face and train the system with that dataset, wi
 
 Not sure where to start? Lets start with documentations, Install app use it and write your experience or make an improvement in existing once. All contributions as little as simple fixing a grammatical error is appreciated.
 
-## Examples
+<details>
+<summary><h2>Examples</h2></summary>
 
 ![GUI ATTENDANCE SYSTEM](examples/example_gui.jpg?raw=true)
 ![GUI DATASET SYSTEM](examples/example_gui_2.jpg?raw=true)
+
+</details>
