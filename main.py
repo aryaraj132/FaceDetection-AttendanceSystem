@@ -110,7 +110,7 @@ class MainApp(App):
             recog = cv2.face.LBPHFaceRecognizer_create()
             try:
                 recog.read(os.path.join(self.Dir, 'trainer', 'trainer.yml'))
-            except FileNotFoundError:
+            except:
                 self.show_message("Training file not found. Please Train the model first.", "main")
                 return
             face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
@@ -328,7 +328,6 @@ class MainApp(App):
             faces,ids=self.getImage_Labels(dataset_path,face)
             if faces is None or ids is None:
                 self.show_message("No Dataset available")
-                print("No Dataset available")
                 return
             recog.train(faces, np.array(ids))
 
