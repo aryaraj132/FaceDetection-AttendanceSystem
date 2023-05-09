@@ -15,14 +15,15 @@ You can create a dataset of your face and train the system with that dataset, wi
 
 ## Libraries used
 
-- Run `pip install -r requirements.txt` it will install all of the following dependencies.
+- Run `pip install -r requirements.txt` it will install all of the following dependencies. Please install manually in case Python version causes issue
 
 1. OpenCV `pip install opencv-python`
 2. Numpy `pip install numpy`
-3. PIL `pip install pillow`
-4. OS (preinstalled)
-5. datetime (preinstalled)
-6. Kivy `pip install kivy` {For GUI}
+3. Pandas `pip install pandas`
+4. PIL `pip install pillow`
+5. OS (preinstalled)
+6. datetime (preinstalled)
+7. Kivy `pip install kivy` {For GUI}
 - Also install `pip install opencv-contrib-python`
 
 <hr />
