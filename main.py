@@ -12,6 +12,7 @@ from datetime import datetime
 from PIL import Image
 from kivy.core.window import Window
 import pandas as pd
+from time import sleep
 Window.clearcolor = (.8, .8, .8, 1)
 
 class AttendenceWindow(Screen):
@@ -28,6 +29,39 @@ kv = Builder.load_file("my.kv")
 class MainApp(App):
     running = False
     Dir = os.path.dirname(os.path.realpath(__file__))
+    msg_thread = None
+    att_thread = None
+    data_thread = None
+    train_thread = None
+    msg_clear = True
+    msg_timer = 0
+    def message_cleaner(self):
+        while True:
+            if not self.msg_clear:
+                while self.msg_timer > 0:
+                    sleep(0.25)
+                    self.msg_timer -= 0.25
+                kv.get_screen('main').ids.info.text = ""
+                kv.get_screen('second').ids.info.text = ""
+                self.msg_clear = True
+    def show_message(self,message, screen="both"):
+        if (self.msg_thread is None) or not(self.msg_thread.is_alive()):
+            self.msg_thread = threading.Thread(target=self.message_cleaner, daemon=True)
+            self.msg_thread.start()
+        if screen=="both":
+            kv.get_screen('main').ids.info.text = message
+            kv.get_screen('second').ids.info.text = message
+            self.msg_timer = 5
+            self.msg_clear = False
+        elif screen=="main":
+            kv.get_screen('main').ids.info.text = message
+            self.msg_timer = 5
+            self.msg_clear = False
+        elif screen=="second":
+            kv.get_screen('second').ids.info.text = message
+            self.msg_timer = 5
+            self.msg_clear = False
+        return
     def build(self):
         self.icon = self.Dir + '/webcam.ico'
         self.title = 'Face Detection Attendance System'
@@ -35,18 +69,36 @@ class MainApp(App):
     def break_loop(self):
         self.running = False
     def startAttendence(self):
-        threading.Thread(target=self.Attendence, daemon=True).start()
+        if self.att_thread is not None and self.att_thread.is_alive():
+            return
+        self.att_thread = threading.Thread(target=self.Attendence, daemon=True)
+        self.att_thread.start()
     def startTrain(self):
-        threading.Thread(target=self.train, daemon=True).start()
+        if self.train_thread is not None and self.train_thread.is_alive():
+            return
+        self.train_thread = threading.Thread(target=self.train, daemon=True)
+        self.train_thread.start()
     def startDataset(self):
-        threading.Thread(target=self.dataset, daemon=True).start()
-    def StudentList(self):
-        os.startfile(self.Dir + '/list/students.csv')
+        if self.data_thread is not None and self.data_thread.is_alive():
+            return
+        self.data_thread = threading.Thread(target=self.dataset, daemon=True)
+        self.data_thread.start()
+    def UserList(self):
+        users_file = os.path.join(self.Dir, 'list', 'users.csv')
+        try:
+            os.startfile(users_file)
+        except FileNotFoundError:
+            self.show_message("Users file not found.")
+            
     def AttendanceList(self):
-        os.startfile(self.Dir + '/Attendance/Attendance.csv')
+        attendance_file = os.path.join(self.Dir, 'Attendance', 'Attendance.csv')
+        try:
+            os.startfile(attendance_file)
+        except FileNotFoundError:
+            self.show_message("Attendance file not found.")
     def Attendence(self):
         self.running = True
-        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        dataset_path = os.path.join(self.Dir, 'dataset') 
         if not (os.path.isdir(dataset_path)):
             os.mkdir(dataset_path)
         try:
@@ -56,7 +108,11 @@ class MainApp(App):
             date = now.strftime("%d/%m/%Y")
             eye = cv2.CascadeClassifier(self.Dir + '/haarcascade_eye.xml')
             recog = cv2.face.LBPHFaceRecognizer_create()
-            recog.read(self.Dir + '/trainer/trainer.yml')
+            try:
+                recog.read(os.path.join(self.Dir, 'trainer', 'trainer.yml'))
+            except:
+                self.show_message("Training file not found. Please Train the model first.", "main")
+                return
             face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
 
             font = cv2.FONT_HERSHEY_DUPLEX
@@ -101,7 +157,11 @@ class MainApp(App):
                         status = "Attandance Recorded"
                         cv2.putText(image, str(status), (x,y+h+25), font, 1, (0,255,0), 1)
                         try:
-                            df = pd.read_csv(self.Dir + '/list/students.csv')
+                            try:
+                                df = pd.read_csv(os.path.join(self.Dir, 'list', 'users.csv'))
+                            except FileNotFoundError:
+                                self.show_message("Users file not found.", "main")
+                                return
                             name = df.loc[df['id'] == id, 'name'].iloc[0]
                         except:
                             name = "Unknown"
@@ -120,36 +180,48 @@ class MainApp(App):
                 if k == 27:
                     break
             if rec==1 and blink >15:
-                df = pd.read_csv(self.Dir + '/Attendance/Attendance.csv')
+                try:
+                    df = pd.read_csv(os.path.join(self.Dir, 'Attendance', 'Attendance.csv'))
+                except FileNotFoundError:
+                    self.show_message("Attendance file not found.", "main")
+                    return
                 coll = ['0']*len(df['id'])
                 if date in df.columns:
                     if (int(df.loc[df['id'] == id, date].iloc[0]))==0:
                         df.loc[df['id'] == id, date]=1
-                        df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
-                        kv.get_screen('main').ids.info.text = "Attendence entered successfully."
+                        df.to_csv(os.path.join(self.Dir, 'Attendance', 'Attendance.csv'), index=False)
+                        self.show_message("Attendance Recorded Successfully.")
                     else:
-                        kv.get_screen('main').ids.info.text = "Attendence already exist."
+                        self.show_message("Attendence already entered.")
                 else:
                     df[date] = coll
                     df.loc[df['id'] == id, date]=1
-                    df.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
-                    kv.get_screen('main').ids.info.text = "Attendence entered successfully."
+                    df.to_csv(os.path.join(self.Dir, 'Attendance', 'Attendance.csv'), index=False)
+                    self.show_message("Attendence entered successfully.")
             else:
-                kv.get_screen('main').ids.info.text = "Attendence not entered."
+                self.show_message("Attendence not entered.", "main")
             camera.release()
             cv2.destroyAllWindows()
+            return
         except Exception as e:
-            kv.get_screen('main').ids.info.text = "Some error occured. Try again!"
+            self.show_message('Some error occured. Try again!', 'main')
             print(e)
+            return
     def display_frame(self, frame, dt):
         texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
         texture.blit_buffer(frame.tobytes(order=None), colorfmt='bgr', bufferfmt='ubyte')
         texture.flip_vertical()
         kv.get_screen('main').ids.vid.texture = texture
     def dataset(self):
-        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        dataset_path = os.path.join(self.Dir, 'dataset') 
+        list_path = os.path.join(self.Dir, 'list') 
+        attendance_path = os.path.join(self.Dir, 'Attendance')
         if not (os.path.isdir(dataset_path)):
             os.mkdir(dataset_path)
+        if not (os.path.isdir(list_path)):
+            os.mkdir(list_path)
+        if not (os.path.isdir(attendance_path)):
+            os.mkdir(attendance_path)
         try:
             name = kv.get_screen('second').ids.user_name.text
             face_id = kv.get_screen('second').ids.user_id.text
@@ -184,14 +256,20 @@ class MainApp(App):
                 cv2.destroyAllWindows()
                 try:
                     exist = False
-                    df = pd.read_csv(self.Dir + '/list/students.csv')
+                    try:
+                        df = pd.read_csv(os.path.join(list_path, 'users.csv'))
+                    except FileNotFoundError:
+                        df = pd.DataFrame(columns = ['id', 'name'])
                     for i in range(len(df['id'])):
                         if df['id'].iloc[i] == int(face_id):
                             exist = True
                     if not exist:
                         df.loc[len(df.index)] = [int(face_id),name]
-                        df.to_csv(self.Dir + '/list/students.csv', index=False)
-                    df1 = pd.read_csv(self.Dir + '/Attendance/Attendance.csv')
+                        df.to_csv(os.path.join(list_path, 'users.csv'), index=False)
+                    try:
+                        df1 = pd.read_csv(os.path.join(attendance_path, 'Attendance.csv'))
+                    except FileNotFoundError:
+                        df1 = pd.DataFrame(columns = ['id', 'name'])
                     for i in range(len(df1['id'])):
                         if df1['id'].iloc[i] == int(face_id):
                             exist = True
@@ -199,16 +277,22 @@ class MainApp(App):
                         arr = [int(face_id),name]
                         arr = np.concatenate((arr,[0]*(len(df1.columns)-2)))
                         df1.loc[len(df1.index)] = arr
-                        df1.to_csv(self.Dir + '/Attendance/Attendance.csv', index=False)
+                        df1.to_csv(os.path.join(attendance_path, 'Attendance.csv'), index=False)
                 except Exception as e:
                     print(e)
-                kv.get_screen('second').ids.info.text = "Face included successfully. Please train the system."
+                    self.show_message(str(e), "second")
+                    return
+                self.show_message("Dataset Created Successfully. Please train the system.", "second")
+                return
         except:
-            kv.get_screen('second').ids.info.text = "Some error occured. Try again!"
+            self.show_message("Some error occured. Please try again.", "second")
+            return
     def getImage_Labels(self, dataset,face):
             imagesPath=[os.path.join(dataset,f) for f in os.listdir(dataset)]
             faceSamples = []
             ids = []
+            if len(imagesPath)<=0:
+                return None, None
             for imagePath in imagesPath:
                 PIL_img=Image.open(imagePath).convert('L')
                 img_numpy = np.array(PIL_img, 'uint8')
@@ -221,22 +305,36 @@ class MainApp(App):
                     ids.append(id)
             return faceSamples,ids
     def train(self):
-        dataset_path = path = os.path.join(self.Dir, 'dataset') 
+        dataset_path = os.path.join(self.Dir, 'dataset')
+        trainer_path = os.path.join(self.Dir, 'trainer') 
         if not (os.path.isdir(dataset_path)):
-            os.mkdir(dataset_path)
+            kv.get_screen('main').ids.info.text = "No Dataset available."
+            kv.get_screen('second').ids.info.text = "No Dataset available."
+            sleep(10)
+            kv.get_screen('main').ids.info.text = ""
+            kv.get_screen('second').ids.info.text = ""
+        if not (os.path.isdir(trainer_path)):
+            os.mkdir(trainer_path)
         kv.get_screen('main').ids.info.text = "Training Faces."
         kv.get_screen('second').ids.info.text = "Training Faces."
-        dataset = self.Dir + '/dataset'
-        recog = cv2.face.LBPHFaceRecognizer_create()
-        face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
+        sleep(10)
+        kv.get_screen('main').ids.info.text = ""
+        kv.get_screen('second').ids.info.text = ""
 
-        faces,ids=self.getImage_Labels(dataset,face)
-        recog.train(faces, np.array(ids))
+        try:
+            recog = cv2.face.LBPHFaceRecognizer_create()
+            face = cv2.CascadeClassifier(self.Dir + '/haarcascade_frontalface_default.xml')
 
-        recog.write(self.Dir + '/trainer/trainer.yml')
+            faces,ids=self.getImage_Labels(dataset_path,face)
+            if faces is None or ids is None:
+                self.show_message("No Dataset available")
+                return
+            recog.train(faces, np.array(ids))
 
-        kv.get_screen('main').ids.info.text = str(len(np.unique(ids))) + " face trained."
-        kv.get_screen('second').ids.info.text = str(len(np.unique(ids))) + " face trained."
-
+            recog.write(os.path.join(trainer_path, 'trainer.yml'))
+            self.show_message(str(len(np.unique(ids))) + " face trained.")
+        except:
+            self.show_message("Some error occured. Try again!")
+            return
 if(__name__ == "__main__"):
     MainApp().run()
