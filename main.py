@@ -8,6 +8,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import cv2
 import numpy as np
 import os
+import sys
+import subprocess
 from datetime import datetime
 from PIL import Image
 from kivy.core.window import Window
@@ -85,17 +87,31 @@ class MainApp(App):
         self.data_thread.start()
     def UserList(self):
         users_file = os.path.join(self.Dir, 'list', 'users.csv')
-        try:
-            os.startfile(users_file)
-        except FileNotFoundError:
+        if not (os.path.exists(users_file)):
             self.show_message("Users file not found.")
+            return
+        try:
+            if sys.platform == "win32":
+                os.startfile(users_file)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, users_file])
+        except Exception as e:
+            print(e)
             
     def AttendanceList(self):
         attendance_file = os.path.join(self.Dir, 'Attendance', 'Attendance.csv')
-        try:
-            os.startfile(attendance_file)
-        except FileNotFoundError:
+        if not (os.path.exists(attendance_file)):
             self.show_message("Attendance file not found.")
+            return
+        try:
+            if sys.platform == "win32":
+                os.startfile(attendance_file)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, attendance_file])
+        except Exception as e:
+            print(e)
     def Attendence(self):
         self.running = True
         dataset_path = os.path.join(self.Dir, 'dataset') 

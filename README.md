@@ -26,6 +26,9 @@ You can create a dataset of your face and train the system with that dataset, wi
 7. Kivy `pip install kivy` {For GUI}
 - Also install `pip install opencv-contrib-python`
 
+    > Try  `sudo apt-get install default-jre libreoffice-java-common` and `sudo apt-get install libstdc++6` in case you are using it with linux.
+    Opening files in linux is currently under development
+
 <hr />
 
 Not sure where to start? Lets start with documentations, Install app use it and write your experience or make an improvement in existing once. All contributions as little as simple fixing a grammatical error is appreciated.
